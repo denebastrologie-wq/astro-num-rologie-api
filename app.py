@@ -1,620 +1,404 @@
-<!DOCTYPE html>
-<html lang="fr">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <style>
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
-        }
-        
-        .astro-container {
-            min-height: 100vh;
-            background: linear-gradient(135deg, #0f0c29 0%, #302b63 50%, #24243e 100%);
-            padding: 40px 20px;
-            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Arial, sans-serif;
-            position: relative;
-        }
-        
-        .astro-container::before {
-            content: '';
-            position: absolute;
-            top: 0;
-            left: 0;
-            right: 0;
-            bottom: 0;
-            background-image: url('TON_LOGO_URL_ICI');
-            background-size: cover;
-            background-position: center;
-            background-repeat: no-repeat;
-            opacity: 0.05;
-            pointer-events: none;
-        }
-        
-        .astro-wrapper {
-            max-width: 1200px;
-            margin: 0 auto;
-        }
-        
-        .header {
-            text-align: center;
-            margin-bottom: 50px;
-        }
-        
-        .header h1 {
-            font-size: 3rem;
-            color: white;
-            font-weight: 300;
-            margin-bottom: 10px;
-            text-shadow: 0 2px 30px rgba(139, 92, 246, 0.5);
-            letter-spacing: 2px;
-        }
-        
-        .header p {
-            color: rgba(255, 255, 255, 0.7);
-            font-size: 1.1rem;
-            font-weight: 300;
-        }
-        
-        .form-card {
-            background: rgba(255, 255, 255, 0.1);
-            backdrop-filter: blur(15px);
-            border-radius: 25px;
-            padding: 40px;
-            margin-bottom: 30px;
-            box-shadow: 0 25px 80px rgba(0, 0, 0, 0.4);
-            border: 1px solid rgba(255, 255, 255, 0.2);
-        }
-        
-        .form-grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
-            gap: 25px;
-            margin-bottom: 30px;
-        }
-        
-        .form-group label {
-            display: block;
-            color: white;
-            font-weight: 600;
-            margin-bottom: 10px;
-            font-size: 1rem;
-        }
-        
-        .form-group input, .form-group select {
-            width: 100%;
-            padding: 15px;
-            border-radius: 12px;
-            background: rgba(255, 255, 255, 0.15);
-            border: 1px solid rgba(255, 255, 255, 0.3);
-            color: white;
-            font-size: 1rem;
-            transition: all 0.3s;
-        }
-        
-        .form-group input::placeholder {
-            color: rgba(255, 255, 255, 0.6);
-        }
-        
-        .form-group input:focus, .form-group select:focus {
-            outline: none;
-            border-color: #a78bfa;
-            box-shadow: 0 0 0 3px rgba(167, 139, 250, 0.3);
-            background: rgba(255, 255, 255, 0.2);
-        }
-        
-        .calculate-btn {
-            width: 100%;
-            background: linear-gradient(135deg, #8b5cf6, #6366f1);
-            color: white;
-            font-weight: bold;
-            padding: 20px;
-            border: none;
-            border-radius: 15px;
-            font-size: 1.2rem;
-            cursor: pointer;
-            transition: all 0.3s;
-            box-shadow: 0 10px 40px rgba(139, 92, 246, 0.5);
-        }
-        
-        .calculate-btn:hover {
-            transform: translateY(-3px);
-            box-shadow: 0 15px 50px rgba(139, 92, 246, 0.7);
-        }
-        
-        .calculate-btn:disabled {
-            background: gray;
-            cursor: not-allowed;
-            transform: none;
-        }
-        
-        .loading {
-            display: none;
-            text-align: center;
-            color: white;
-            font-size: 1.2rem;
-            padding: 20px;
-        }
-        
-        .loading.show {
-            display: block;
-        }
-        
-        .spinner {
-            border: 4px solid rgba(255, 255, 255, 0.3);
-            border-top: 4px solid white;
-            border-radius: 50%;
-            width: 50px;
-            height: 50px;
-            animation: spin 1s linear infinite;
-            margin: 20px auto;
-        }
-        
-        @keyframes spin {
-            0% { transform: rotate(0deg); }
-            100% { transform: rotate(360deg); }
-        }
-        
-        .results {
-            display: none;
-        }
-        
-        .results.show {
-            display: block;
-        }
-        
-        .section-title {
-            color: white;
-            font-size: 2rem;
-            font-weight: bold;
-            margin: 40px 0 20px 0;
-            text-align: center;
-            text-shadow: 0 2px 10px rgba(0, 0, 0, 0.5);
-        }
-        
-        /* Numérologie */
-        .numero-grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
-            gap: 20px;
-            margin-bottom: 30px;
-        }
-        
-        .numero-card {
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-            border-radius: 15px;
-            padding: 30px;
-            text-align: center;
-            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
-            border: 1px solid rgba(255, 255, 255, 0.1);
-        }
-        
-        .numero-card h3 {
-            color: white;
-            font-size: 1.2rem;
-            margin-bottom: 15px;
-        }
-        
-        .numero-card .big-number {
-            font-size: 4rem;
-            color: white;
-            font-weight: bold;
-            margin: 10px 0;
-        }
-        
-        .cvh-grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
-            gap: 20px;
-            margin-bottom: 30px;
-        }
-        
-        .cvh-card {
-            background: linear-gradient(135deg, #8b5cf6, #6366f1);
-            border-radius: 20px;
-            padding: 25px;
-            box-shadow: 0 15px 40px rgba(0, 0, 0, 0.3);
-        }
-        
-        .cvh-card h4 {
-            color: white;
-            font-size: 1.1rem;
-            margin-bottom: 10px;
-        }
-        
-        .cvh-card .number {
-            font-size: 3rem;
-            color: white;
-            font-weight: bold;
-        }
-        
-        /* Semaines */
-        .semaines-table {
-            background: rgba(255, 255, 255, 0.1);
-            backdrop-filter: blur(10px);
-            border-radius: 20px;
-            padding: 30px;
-            overflow-x: auto;
-            margin-bottom: 30px;
-        }
-        
-        table {
-            width: 100%;
-            border-collapse: collapse;
-            color: white;
-        }
-        
-        th {
-            background: rgba(139, 92, 246, 0.5);
-            padding: 15px;
-            text-align: left;
-            font-weight: 600;
-        }
-        
-        td {
-            padding: 15px;
-            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
-        }
-        
-        tr:hover {
-            background: rgba(255, 255, 255, 0.05);
-        }
-        
-        /* Astrologie */
-        .astro-section {
-            background: rgba(255, 255, 255, 0.1);
-            backdrop-filter: blur(10px);
-            border-radius: 20px;
-            padding: 30px;
-            margin-bottom: 30px;
-        }
-        
-        .astro-section h3 {
-            color: #a78bfa;
-            font-size: 1.8rem;
-            margin-bottom: 20px;
-        }
-        
-        .planetes-grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
-            gap: 15px;
-            margin-bottom: 20px;
-        }
-        
-        .planete-item {
-            background: rgba(167, 139, 250, 0.2);
-            padding: 15px;
-            border-radius: 12px;
-            border-left: 4px solid #a78bfa;
-        }
-        
-        .planete-item .nom {
-            color: #c4b5fd;
-            font-weight: 600;
-            margin-bottom: 5px;
-        }
-        
-        .planete-item .position {
-            color: white;
-            font-size: 1.1rem;
-        }
-        
-        .maisons-grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
-            gap: 10px;
-        }
-        
-        .maison-item {
-            background: rgba(99, 102, 241, 0.2);
-            padding: 12px;
-            border-radius: 10px;
-            text-align: center;
-        }
-        
-        .maison-item .nom {
-            color: #93c5fd;
-            font-size: 0.9rem;
-            margin-bottom: 5px;
-        }
-        
-        .maison-item .signe {
-            color: white;
-            font-weight: 600;
-        }
-        
-        .error-message {
-            background: rgba(239, 68, 68, 0.2);
-            border: 1px solid #ef4444;
-            color: white;
-            padding: 20px;
-            border-radius: 15px;
-            margin: 20px 0;
-            display: none;
-        }
-        
-        .error-message.show {
-            display: block;
-        }
-        
-        @media (max-width: 768px) {
-            .header h1 {
-                font-size: 2rem;
-            }
-            
-            .form-card {
-                padding: 25px;
-            }
-            
-            .form-grid {
-                grid-template-columns: 1fr;
-            }
-        }
-    </style>
-</head>
-<body>
-    <div class="astro-container">
-        <div class="astro-wrapper">
-            <!-- Header -->
-            <div class="header">
-                <h1>ASTROLOGIE & NUMÉROLOGIE</h1>
-                <p>Analyse complète de votre thème</p>
-            </div>
+python"""
+API Flask pour Calculs Astrologiques et Numérologiques
+Nécessite: pip install flask flask-cors swisseph skyfield pytz
+"""
 
-            <!-- Formulaire -->
-            <div class="form-card">
-                <div class="form-grid">
-                    <div class="form-group">
-                        <label>👤 Prénom</label>
-                        <input type="text" id="prenom" placeholder="Ex: Robert">
-                    </div>
-                    <div class="form-group">
-                        <label>👤 Nom</label>
-                        <input type="text" id="nom" placeholder="Ex: Martinez">
-                    </div>
-                    <div class="form-group">
-                        <label>📅 Date de naissance</label>
-                        <input type="text" id="date" placeholder="JJ/MM/AAAA (ex: 24/08/1963)">
-                    </div>
-                    <div class="form-group">
-                        <label>🕐 Heure de naissance</label>
-                        <input type="text" id="heure" placeholder="HH:MM (ex: 14:30)">
-                    </div>
-                    <div class="form-group">
-                        <label>📍 Lieu de naissance</label>
-                        <input type="text" id="lieu" placeholder="Ex: Paris, Orsay">
-                    </div>
-                    <div class="form-group">
-                        <label>📆 Année de révolution solaire</label>
-                        <input type="number" id="annee_rs" placeholder="2025" value="2025">
-                    </div>
-                </div>
-                <button class="calculate-btn" id="calculateBtn" onclick="calculerTheme()">
-                    🔮 Calculer le Thème Complet
-                </button>
-            </div>
+from flask import Flask, request, jsonify
+from flask_cors import CORS
+import swisseph as swe
+from datetime import datetime, timedelta
+import pytz
+from skyfield.api import load, wgs84
+import math
 
-            <!-- Loading -->
-            <div class="loading" id="loading">
-                <div class="spinner"></div>
-                <p>Calcul en cours des positions planétaires...</p>
-            </div>
+app = Flask(__name__)
+CORS(app)  # Permet les requêtes depuis Squarespace
 
-            <!-- Message d'erreur -->
-            <div class="error-message" id="errorMessage"></div>
+# ==================== NUMÉROLOGIE ====================
 
-            <!-- Résultats -->
-            <div class="results" id="results">
-                <!-- Numérologie -->
-                <h2 class="section-title">🔢 Numérologie</h2>
-                
-                <div class="numero-grid">
-                    <div class="numero-card">
-                        <h3>Chemin de Vie</h3>
-                        <div class="big-number" id="cheminVie">-</div>
-                    </div>
-                </div>
+TABLE_NUMEROLOGIE = {
+    'A': 1, 'J': 1, 'S': 1, 'B': 2, 'K': 2, 'T': 2,
+    'C': 3, 'L': 3, 'U': 3, 'D': 4, 'M': 4, 'V': 4,
+    'E': 5, 'N': 5, 'W': 5, 'F': 6, 'O': 6, 'X': 6,
+    'G': 7, 'P': 7, 'Y': 7, 'H': 8, 'Q': 8, 'Z': 8,
+    'I': 9, 'R': 9
+}
 
-                <div class="cvh-grid">
-                    <div class="cvh-card">
-                        <h4>CVH 1 - Départ</h4>
-                        <div class="number" id="cvh1">-</div>
-                    </div>
-                    <div class="cvh-card">
-                        <h4>CVH 2 - Action</h4>
-                        <div class="number" id="cvh2">-</div>
-                    </div>
-                    <div class="cvh-card">
-                        <h4>CVH 3 - Finalité</h4>
-                        <div class="number" id="cvh3">-</div>
-                    </div>
-                </div>
+def reduire_a_22(nombre):
+    """Réduit un nombre jusqu'à 22 maximum"""
+    chiffre_reduit = nombre
+    while chiffre_reduit > 22:
+        somme = sum(int(c) for c in str(chiffre_reduit))
+        chiffre_reduit = somme
+    return chiffre_reduit
 
-                <div class="semaines-table">
-                    <h3 style="color: white; margin-bottom: 20px;">📅 Triangle Numérologique (Périodes de 4 mois)</h3>
-                    <div id="triangleDisplay" style="color: white;"></div>
-                </div>
+def calculer_somme_texte(texte):
+    """Calcule la somme numérologique d'un texte"""
+    texte = texte.upper().replace(' ', '')
+    return sum(TABLE_NUMEROLOGIE.get(lettre, 0) for lettre in texte)
 
-                <!-- Astrologie -->
-                <h2 class="section-title">🌟 Thème Natal</h2>
-                <div class="astro-section" id="themeNatal"></div>
+def calculer_chemin_vie(jour, mois, annee):
+    """Calcule le chemin de vie"""
+    chiffre_jour = reduire_a_22(jour)
+    chiffre_mois = reduire_a_22(mois)
+    somme_annee = sum(int(c) for c in str(annee))
+    chiffre_annee = reduire_a_22(somme_annee)
+    return reduire_a_22(chiffre_jour + chiffre_mois + chiffre_annee)
 
-                <h2 class="section-title">☀️ Révolution Solaire <span id="anneeRS"></span></h2>
-                <div class="astro-section" id="revolutionSolaire"></div>
+def calculer_cvh(prenom, nom, date_naissance, lieu):
+    """Calcule les 3 CVH"""
+    jour, mois, annee = date_naissance
+    
+    # CVH 1 (Nom + Prénom)
+    somme_prenom = calculer_somme_texte(prenom)
+    somme_nom = calculer_somme_texte(nom)
+    cvh1 = reduire_a_22(somme_prenom + somme_nom)
+    
+    # Chemin de vie
+    chemin_vie = calculer_chemin_vie(jour, mois, annee)
+    
+    # CVH 3 (Date + Lieu)
+    somme_lieu = calculer_somme_texte(lieu)
+    chiffre_lieu = reduire_a_22(somme_lieu)
+    cvh3 = reduire_a_22(chemin_vie + chiffre_lieu)
+    
+    # CVH 2 (CVH1 + CVH3)
+    cvh2 = reduire_a_22(cvh1 + cvh3)
+    
+    return cvh1, cvh2, cvh3, chemin_vie
 
-                <h2 class="section-title">🔄 Thème Progressé</h2>
-                <div class="astro-section" id="themeProgresse"></div>
-            </div>
-        </div>
-    </div>
+def generer_semaines_numerologiques(cvh1, cvh2, cvh3, annee_rs):
+    """
+    Génère le tableau numérologique sur 6 lignes avec périodes de 4 mois
+    
+    SYSTÈME DE TRANSITION ANNUELLE :
+    - Ligne 1 est une séquence continue qui traverse les années
+    - Chaque période = 4 mois
+    - Les transitions se calculent entre fin année N-1 et début année N
+    """
+    
+    def reduire_avec_maitres(nombre):
+        """Réduit un nombre en conservant 11 et 22"""
+        if nombre == 11 or nombre == 22:
+            return nombre
+        while nombre > 22:
+            somme = sum(int(c) for c in str(nombre))
+            if somme == 11 or somme == 22:
+                return somme
+            nombre = somme
+        return nombre
+    
+    # Année actuelle et précédente réduites
+    annee_actuelle = reduire_a_22(sum(int(c) for c in str(annee_rs)))
+    annee_precedente = reduire_a_22(sum(int(c) for c in str(annee_rs - 1)))
+    
+    # ===== LIGNE 1 - Séquence continue =====
+    # Année précédente (N-1)
+    l1_n1_p1 = reduire_avec_maitres(cvh1 + annee_precedente)
+    l1_n1_p3 = reduire_avec_maitres(cvh3 + annee_precedente)
+    l1_n1_p2 = reduire_avec_maitres(l1_n1_p1 + l1_n1_p3)
+    
+    # Année actuelle (N)
+    l1_n_p1 = reduire_avec_maitres(cvh1 + annee_actuelle)
+    l1_n_p3 = reduire_avec_maitres(cvh3 + annee_actuelle)
+    l1_n_p2 = reduire_avec_maitres(l1_n_p1 + l1_n_p3)
+    
+    # La Ligne 1 complète traverse les années : [N-1_p3, N_p1, N_p2, N_p3]
+    # Exemple 2024→2025 : [20, 22, 7, 21]
+    ligne1 = [l1_n1_p3, l1_n_p1, l1_n_p2, l1_n_p3]
+    
+    # ===== LIGNE 2 - Additions consécutives =====
+    # Chaque nombre = somme de 2 nombres adjacents de Ligne 1
+    ligne2 = []
+    for i in range(len(ligne1) - 1):
+        ligne2.append(reduire_avec_maitres(ligne1[i] + ligne1[i+1]))
+    # ligne2 = [20+22, 22+7, 7+21] = [6, 11, 10]
+    
+    # ===== LIGNE 3 - Additions consécutives =====
+    ligne3 = []
+    for i in range(len(ligne2) - 1):
+        ligne3.append(reduire_avec_maitres(ligne2[i] + ligne2[i+1]))
+    # ligne3 = [6+11, 11+10] = [17, 21]
+    
+    # ===== LIGNE 4 - Additions consécutives =====
+    ligne4 = []
+    for i in range(len(ligne3) - 1):
+        ligne4.append(reduire_avec_maitres(ligne3[i] + ligne3[i+1]))
+    # ligne4 = [17+21] = [11]
+    
+    # ===== LIGNE 5 - Si possible =====
+    ligne5 = []
+    if len(ligne4) > 1:
+        for i in range(len(ligne4) - 1):
+            ligne5.append(reduire_avec_maitres(ligne4[i] + ligne4[i+1]))
+    
+    # ===== LIGNE 6 - Si possible =====
+    ligne6 = []
+    if len(ligne5) > 1:
+        for i in range(len(ligne5) - 1):
+            ligne6.append(reduire_avec_maitres(ligne5[i] + ligne5[i+1]))
+    
+    # Construction du résultat avec toutes les lignes
+    lignes = [
+        {
+            "ligne": 1,
+            "nom": "Ligne 1 - Base année",
+            "periodes": ligne1,
+            "description": f"Transition {annee_rs-1}→{annee_rs}"
+        },
+        {
+            "ligne": 2,
+            "nom": "Ligne 2",
+            "periodes": ligne2,
+            "description": "Additions consécutives"
+        },
+        {
+            "ligne": 3,
+            "nom": "Ligne 3",
+            "periodes": ligne3,
+            "description": "Niveau intermédiaire"
+        },
+        {
+            "ligne": 4,
+            "nom": "Ligne 4",
+            "periodes": ligne4,
+            "description": "Synthèse"
+        }
+    ]
+    
+    if ligne5:
+        lignes.append({
+            "ligne": 5,
+            "nom": "Ligne 5",
+            "periodes": ligne5,
+            "description": "Convergence"
+        })
+    
+    if ligne6:
+        lignes.append({
+            "ligne": 6,
+            "nom": "Ligne 6",
+            "periodes": ligne6,
+            "description": "Point final"
+        })
+    
+    return lignes
 
-    <script>
-        // URL de ton API sur Render
-        const API_URL = 'https://astro-num-rologie-api-6.onrender.com/api/calcul-complet';
+# ==================== ASTROLOGIE ====================
 
-        async function calculerTheme() {
-            // Récupérer les valeurs
-            const prenom = document.getElementById('prenom').value.trim();
-            const nom = document.getElementById('nom').value.trim();
-            const date = document.getElementById('date').value.trim();
-            const heure = document.getElementById('heure').value.trim() || '12:00';
-            const lieu = document.getElementById('lieu').value.trim();
-            const annee_rs = parseInt(document.getElementById('annee_rs').value) || 2025;
+# Initialiser Swiss Ephemeris
+swe.set_ephe_path(None)  # Utilise les éphémérides par défaut
 
-            // Validation
-            if (!prenom || !nom || !date || !lieu) {
-                afficherErreur('Merci de remplir tous les champs obligatoires !');
-                return;
-            }
+PLANETES = {
+    'Soleil': swe.SUN,
+    'Lune': swe.MOON,
+    'Mercure': swe.MERCURY,
+    'Vénus': swe.VENUS,
+    'Mars': swe.MARS,
+    'Jupiter': swe.JUPITER,
+    'Saturne': swe.SATURN,
+    'Uranus': swe.URANUS,
+    'Neptune': swe.NEPTUNE,
+    'Pluton': swe.PLUTO
+}
 
-            // Afficher le loading
-            document.getElementById('loading').classList.add('show');
-            document.getElementById('calculateBtn').disabled = true;
-            document.getElementById('results').classList.remove('show');
-            document.getElementById('errorMessage').classList.remove('show');
+SIGNES = [
+    "Bélier", "Taureau", "Gémeaux", "Cancer",
+    "Lion", "Vierge", "Balance", "Scorpion",
+    "Sagittaire", "Capricorne", "Verseau", "Poissons"
+]
 
-            try {
-                // Appel à l'API
-                const response = await fetch(API_URL, {
-                    method: 'POST',
-                    headers: {
-                        'Content-Type': 'application/json',
-                    },
-                    body: JSON.stringify({
-                        prenom,
-                        nom,
-                        date,
-                        heure,
-                        lieu,
-                        annee_rs
-                    })
-                });
+def coords_to_lat_lon(lieu_str):
+    """Convertit un lieu en coordonnées (simplifié - à améliorer avec geocoding)"""
+    # Base de données simplifiée
+    lieux = {
+        'paris': (48.8566, 2.3522),
+        'orsay': (48.6981, 2.1878),
+        'lyon': (45.7640, 4.8357),
+        'marseille': (43.2965, 5.3698),
+        'toulouse': (43.6047, 1.4442),
+    }
+    lieu_lower = lieu_str.lower().strip()
+    return lieux.get(lieu_lower, (48.8566, 2.3522))  # Paris par défaut
 
-                if (!response.ok) {
-                    throw new Error('Erreur de communication avec le serveur');
-                }
+def calcul_date_julienne(dt):
+    """Convertit une date en jour julien"""
+    return swe.julday(dt.year, dt.month, dt.day, 
+                      dt.hour + dt.minute/60.0 + dt.second/3600.0)
 
-                const data = await response.json();
-                
-                // Afficher les résultats
-                afficherResultats(data);
+def calculer_theme_natal(dt, lat, lon):
+    """Calcule le thème natal complet"""
+    jd = calcul_date_julienne(dt)
+    
+    # Positions planétaires
+    positions = {}
+    for nom, code in PLANETES.items():
+        pos = swe.calc_ut(jd, code)[0]
+        longitude = pos[0]
+        signe_idx = int(longitude / 30)
+        degre_dans_signe = longitude % 30
+        
+        positions[nom] = {
+            'longitude': round(longitude, 2),
+            'signe': SIGNES[signe_idx],
+            'degre': round(degre_dans_signe, 2),
+            'notation': f"{round(degre_dans_signe)}°{SIGNES[signe_idx]}"
+        }
+    
+    # Maisons (système Placidus)
+    maisons_data = swe.houses(jd, lat, lon, b'P')
+    maisons = {}
+    
+    for i, cuspide in enumerate(maisons_data[0][:12], 1):
+        signe_idx = int(cuspide / 30)
+        degre = cuspide % 30
+        maisons[f"Maison {i}"] = {
+            'longitude': round(cuspide, 2),
+            'signe': SIGNES[signe_idx],
+            'degre': round(degre, 2)
+        }
+    
+    # Points spéciaux
+    asc = maisons_data[0][0]
+    mc = maisons_data[0][9]
+    
+    return {
+        'planetes': positions,
+        'maisons': maisons,
+        'ascendant': {
+            'longitude': round(asc, 2),
+            'signe': SIGNES[int(asc / 30)],
+            'degre': round(asc % 30, 2)
+        },
+        'milieu_ciel': {
+            'longitude': round(mc, 2),
+            'signe': SIGNES[int(mc / 30)],
+            'degre': round(mc % 30, 2)
+        }
+    }
 
-            } catch (error) {
-                console.error('Erreur:', error);
-                afficherErreur('Impossible de calculer le thème. Vérifiez que l\'API est en ligne. ' + error.message);
-            } finally {
-                document.getElementById('loading').classList.remove('show');
-                document.getElementById('calculateBtn').disabled = false;
+def calculer_revolution_solaire(dt_naissance, annee_rs, lat, lon):
+    """Calcule la révolution solaire pour une année donnée"""
+    # Position du Soleil natal
+    jd_natal = calcul_date_julienne(dt_naissance)
+    pos_soleil_natal = swe.calc_ut(jd_natal, swe.SUN)[0][0]
+    
+    # Chercher la date exacte de RS dans l'année donnée
+    dt_approx = datetime(annee_rs, dt_naissance.month, dt_naissance.day, 12, 0)
+    
+    # Affiner la recherche (à +/- 2 jours)
+    for delta_heures in range(-48, 49):
+        dt_test = dt_approx + timedelta(hours=delta_heures)
+        jd_test = calcul_date_julienne(dt_test)
+        pos_soleil = swe.calc_ut(jd_test, swe.SUN)[0][0]
+        
+        # Si on est à moins de 0.1° de la position natale
+        if abs(pos_soleil - pos_soleil_natal) < 0.1:
+            return calculer_theme_natal(dt_test, lat, lon)
+    
+    # Fallback: utiliser la date approximative
+    return calculer_theme_natal(dt_approx, lat, lon)
+
+def calculer_theme_progresse(dt_naissance, date_actuelle, lat, lon):
+    """
+    Calcule le thème progressé (1 jour = 1 an)
+    Progression secondaire
+    """
+    jours_ecoules = (date_actuelle - dt_naissance).days
+    annees_ecoulees = jours_ecoules / 365.25
+    
+    # Date progressée = naissance + nombre d'années en jours
+    dt_progresse = dt_naissance + timedelta(days=annees_ecoulees)
+    
+    return calculer_theme_natal(dt_progresse, lat, lon)
+
+# ==================== API ROUTES ====================
+
+@app.route('/api/calcul-complet', methods=['POST'])
+def calcul_complet():
+    """
+    Endpoint principal pour tous les calculs
+    
+    Body JSON:
+    {
+        "prenom": "Robert",
+        "nom": "Martinez",
+        "date": "24/08/1963",
+        "heure": "14:30",
+        "lieu": "Orsay",
+        "annee_rs": 2025
+    }
+    """
+    try:
+        data = request.json
+        
+        # Extraction des données
+        prenom = data['prenom']
+        nom = data['nom']
+        date_str = data['date']  # format: DD/MM/YYYY
+        heure_str = data.get('heure', '12:00')  # format: HH:MM
+        lieu = data['lieu']
+        annee_rs = data.get('annee_rs', datetime.now().year)
+        
+        # Parser la date et l'heure
+        jour, mois, annee = map(int, date_str.split('/'))
+        heure, minute = map(int, heure_str.split(':'))
+        
+        dt_naissance = datetime(annee, mois, jour, heure, minute)
+        lat, lon = coords_to_lat_lon(lieu)
+        
+        # === CALCULS NUMÉROLOGIQUES ===
+        cvh1, cvh2, cvh3, chemin_vie = calculer_cvh(
+            prenom, nom, (jour, mois, annee), lieu
+        )
+        
+        semaines = generer_semaines_numerologiques(cvh1, cvh2, cvh3, annee_rs)
+        
+        # === CALCULS ASTROLOGIQUES ===
+        theme_natal = calculer_theme_natal(dt_naissance, lat, lon)
+        revolution_solaire = calculer_revolution_solaire(dt_naissance, annee_rs, lat, lon)
+        theme_progresse = calculer_theme_progresse(dt_naissance, datetime.now(), lat, lon)
+        
+        # === RÉSULTAT COMPLET ===
+        resultat = {
+            'numerologie': {
+                'cvh1': cvh1,
+                'cvh2': cvh2,
+                'cvh3': cvh3,
+                'chemin_vie': chemin_vie,
+                'lignes': semaines  # Changé de 'semaines' à 'lignes'
+            },
+            'astrologie': {
+                'theme_natal': theme_natal,
+                'revolution_solaire': revolution_solaire,
+                'theme_progresse': theme_progresse
+            },
+            'informations': {
+                'nom_complet': f"{prenom} {nom}",
+                'date_naissance': dt_naissance.strftime('%d/%m/%Y %H:%M'),
+                'lieu': lieu,
+                'coordonnees': {'latitude': lat, 'longitude': lon},
+                'annee_rs': annee_rs
             }
         }
+        
+        return jsonify(resultat), 200
+        
+    except Exception as e:
+        return jsonify({'erreur': str(e)}), 400
 
-        function afficherResultats(data) {
-            const { numerologie, astrologie } = data;
+@app.route('/api/test', methods=['GET'])
+def test():
+    """Route de test pour vérifier que l'API fonctionne"""
+    return jsonify({
+        'status': 'OK',
+        'message': 'API Astrologie/Numérologie fonctionnelle',
+        'version': '1.0'
+    })
 
-            // Numérologie
-            document.getElementById('cheminVie').textContent = numerologie.chemin_vie;
-            document.getElementById('cvh1').textContent = numerologie.cvh1;
-            document.getElementById('cvh2').textContent = numerologie.cvh2;
-            document.getElementById('cvh3').textContent = numerologie.cvh3;
+# ==================== LANCEMENT ====================
 
-            // Triangle numérologique
-            const triangleDiv = document.getElementById('triangleDisplay');
-            let triangleHTML = '';
-            
-            numerologie.lignes.forEach(ligne => {
-                triangleHTML += `
-                    <div style="margin: 20px 0; padding: 20px; background: rgba(139, 92, 246, 0.2); border-radius: 15px; border-left: 4px solid #8b5cf6;">
-                        <h4 style="color: #a78bfa; margin-bottom: 10px;">${ligne.nom}</h4>
-                        <div style="display: flex; gap: 15px; justify-content: center; align-items: center; flex-wrap: wrap;">
-                `;
-                
-                ligne.periodes.forEach((periode, index) => {
-                    triangleHTML += `
-                        <div style="background: linear-gradient(135deg, #6366f1, #8b5cf6); padding: 20px 30px; border-radius: 12px; min-width: 60px; text-align: center;">
-                            <div style="font-size: 2rem; font-weight: bold;">${periode}</div>
-                            <div style="font-size: 0.85rem; opacity: 0.8; margin-top: 5px;">4 mois</div>
-                        </div>
-                    `;
-                });
-                
-                triangleHTML += `
-                        </div>
-                        <div style="margin-top: 10px; font-size: 0.9rem; opacity: 0.8;">${ligne.description}</div>
-                    </div>
-                `;
-            });
-            
-            triangleDiv.innerHTML = triangleHTML;
-
-            // Thèmes astrologiques
-            afficherTheme('themeNatal', astrologie.theme_natal);
-            afficherTheme('revolutionSolaire', astrologie.revolution_solaire);
-            afficherTheme('themeProgresse', astrologie.theme_progresse);
-            
-            document.getElementById('anneeRS').textContent = data.informations.annee_rs;
-
-            // Afficher les résultats
-            document.getElementById('results').classList.add('show');
-            document.getElementById('results').scrollIntoView({ behavior: 'smooth' });
-        }
-
-        function afficherTheme(elementId, theme) {
-            const container = document.getElementById(elementId);
-            
-            let html = '<h3>🪐 Planètes</h3><div class="planetes-grid">';
-            
-            for (const [nom, data] of Object.entries(theme.planetes)) {
-                html += `
-                    <div class="planete-item">
-                        <div class="nom">${nom}</div>
-                        <div class="position">${data.notation}</div>
-                    </div>
-                `;
-            }
-            
-            html += '</div>';
-            
-            html += `
-                <h3 style="color: #a78bfa; margin-top: 30px; margin-bottom: 15px;">🏠 Maisons</h3>
-                <div class="maisons-grid">
-            `;
-            
-            for (const [nom, data] of Object.entries(theme.maisons)) {
-                html += `
-                    <div class="maison-item">
-                        <div class="nom">${nom}</div>
-                        <div class="signe">${Math.round(data.degre)}° ${data.signe}</div>
-                    </div>
-                `;
-            }
-            
-            html += '</div>';
-            
-            html += `
-                <div style="margin-top: 30px; display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 15px;">
-                    <div class="planete-item">
-                        <div class="nom">⬆️ Ascendant</div>
-                        <div class="position">${Math.round(theme.ascendant.degre)}° ${theme.ascendant.signe}</div>
-                    </div>
-                    <div class="planete-item">
-                        <div class="nom">⬆️ Milieu du Ciel</div>
-                        <div class="position">${Math.round(theme.milieu_ciel.degre)}° ${theme.milieu_ciel.signe}</div>
-                    </div>
-                </div>
-            `;
-            
-            container.innerHTML = html;
-        }
-
-        function afficherErreur(message) {
-            const errorDiv = document.getElementById('errorMessage');
-            errorDiv.textContent = '❌ ' + message;
-            errorDiv.classList.add('show');
-            setTimeout(() => errorDiv.classList.remove('show'), 5000);
-        }
-    </script>
-</body>
-</html>
+if __name__ == '__main__':
+    import os
+    port = int(os.environ.get('PORT', 5000))
+    app.run(debug=False, host='0.0.0.0', port=port)
