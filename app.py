@@ -13,6 +13,18 @@ import math
 
 app = Flask(__name__)
 CORS(app)  # Permet les requêtes depuis Squarespace
+# Route d'accueil
+@app.route('/')
+def home():
+    return jsonify({
+        'status': 'OK',
+        'message': 'API Astrologie & Numérologie',
+        'version': '1.0',
+        'endpoints': {
+            'test': '/api/test',
+            'calcul_complet': '/api/calcul-complet (POST)'
+        }
+    })
 
 # ==================== NUMÉROLOGIE ====================
 
