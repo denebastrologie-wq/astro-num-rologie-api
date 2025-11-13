@@ -12,7 +12,8 @@ from skyfield.api import load, wgs84
 import math
 
 app = Flask(__name__)
-CORS(app, origins=[
+
+CORS(app)  # Autorise tout le monde
     "https://deneb.company",
     "https://www.deneb.company",
     "https://deneb.squarespace.com"
