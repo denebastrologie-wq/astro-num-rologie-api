@@ -3,7 +3,7 @@ API Flask pour Calculs Astrologiques et Numérologiques
 Nécessite: pip install flask flask-cors swisseph skyfield pytz
 """
 
-from flask import Flask, request, jsonify
+from flask import Flask, request, jso
 from flask_cors import CORS
 import swisseph as swe
 from datetime import datetime, timedelta
@@ -12,6 +12,10 @@ from skyfield.api import load, wgs84
 import math
 
 app = Flask(__name__)
+CORS(app, origins=[
+    "https://deneb.company",
+    "https://www.deneb.company",
+    "https://deneb.squarespace.com"
 CORS(app)  # Permet les requêtes depuis Squarespace
 # Route d'accueil
 @app.route('/')
