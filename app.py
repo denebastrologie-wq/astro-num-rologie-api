@@ -16,6 +16,8 @@ CORS(app, origins=[
     "https://deneb.company",
     "https://www.deneb.company",
     "https://deneb.squarespace.com"
+])
+
 # Route d'accueil
 @app.route('/')
 def home():
