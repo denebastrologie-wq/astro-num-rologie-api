@@ -15,8 +15,6 @@ app = Flask(__name__)
 CORS(app)
 
 # Route d'accueil
-
-
 @app.route('/')
 def home():
     return jsonify({
@@ -28,6 +26,7 @@ def home():
             'calcul_complet': '/api/calcul-complet (POST)'
         }
     })
+
 
 # ==================== NUMÉROLOGIE ====================
 
