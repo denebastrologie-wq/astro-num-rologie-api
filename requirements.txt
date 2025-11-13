@@ -5,7 +5,7 @@ skyfield==1.49
 numpy<2.0.0
 pytz==2023.3
 gunicorn==21.2.0
-flask-cors
+
 
 
 
